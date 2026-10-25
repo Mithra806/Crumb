@@ -2,7 +2,7 @@
 
 you're just a little guy. a tiny ant crosses a giant house (kitchen, living room, backyard), grabbing crumbs for more time while giant feet stomp down.
 
-Play it: [[your itch.io link]](https://mytra.itch.io/crumb)
+Play it: [[Play Crumb Here!]](https://mytra.itch.io/crumb)
 
 ## Controls
 - arrow keys / WASD: move
