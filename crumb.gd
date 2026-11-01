@@ -118,7 +118,6 @@ func _process(delta):
 		queue_redraw()
 		return
 
-	# the clock
 	time_left -= delta
 	stage_banner -= delta
 	if time_left <= 0.0:
@@ -222,7 +221,6 @@ func draw_art(n, rect):
 
 
 func draw_full(n):
-	# keeps the picture's own shape; any leftover side space gets a soft peach color
 	var tx = get_tex(n)
 	draw_rect(Rect2(0, 0, W, H), Color("#EFD5C9"))
 	var sc = min(float(W) / tx.get_width(), float(H) / tx.get_height())
