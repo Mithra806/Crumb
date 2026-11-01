@@ -1,18 +1,11 @@
 extends Node2D
 
-# CRUMB - tiny ant, giant house. Attach to a Node2D (640x360 viewport).
-# Journey through 3 settings, grab crumbs (+time), dodge giant feet, get home before time runs out.
-# Playable with placeholder shapes. Drop PNGs into res://art/ and they replace the shapes:
-#   ant.png  ant_carrying.png  ant_squished.png  crumb.png  giant_foot.png
-#   floor_1.png  floor_2.png  floor_3.png  nest.png  nest_ending.png
-# Optional font: res://art/Itim-Regular.ttf
-
 const W = 640
 const H = 360
-const STAGES = 3          # how many settings (needs floor_1 ... floor_N)
-const NEED = 5            # crumbs you must carry to the final nest
-const TIME_START = 40.0   # seconds on the clock at the start
-const TIME_BONUS = 3.0    # seconds gained per crumb
+const STAGES = 3        
+const NEED = 5           
+const TIME_START = 40.0   
+const TIME_BONUS = 3.0 
 const HIT_RADIUS = 45.0
 
 var STAGE_NAMES = ["the kitchen", "the living room", "the backyard"]
@@ -134,7 +127,6 @@ func _process(delta):
 		queue_redraw()
 		return
 
-	# movement: arrows or wasd, hold shift to sneak
 	var dir = Vector2.ZERO
 	if Input.is_physical_key_pressed(KEY_RIGHT) or Input.is_physical_key_pressed(KEY_D):
 		dir.x += 1
@@ -157,14 +149,12 @@ func _process(delta):
 	ant.x = clamp(ant.x, 10.0, W - 10.0)
 	ant.y = clamp(ant.y, 80.0, H - 10.0)
 
-	# pick up crumbs (+time)
 	for i in range(crumbs_on_floor.size() - 1, -1, -1):
 		if ant.distance_to(crumbs_on_floor[i]) < 16.0:
 			crumbs_on_floor.remove_at(i)
 			carried += 1
 			time_left += TIME_BONUS
 
-	# reach the right edge: next setting, or home on the last one
 	if stage < STAGES - 1:
 		if ant.x >= W - 12.0:
 			next_stage()
@@ -173,7 +163,6 @@ func _process(delta):
 			state = "win"
 			end_time = time
 
-	# giant feet: harder in later settings, aim near you, worse aim if you sneak
 	var diff = stage * 2.5
 	spawn_timer -= delta
 	if spawn_timer <= 0.0:
@@ -195,7 +184,6 @@ func _process(delta):
 	queue_redraw()
 
 
-# ---------- drawing helpers ----------
 
 func text_in(rect, msg, size, color):
 	var y = rect.position.y + rect.size.y / 2.0 + size * 0.35
@@ -291,7 +279,6 @@ func draw_ant_game():
 
 
 func draw_hud():
-	# left panel: crumbs + journey bar
 	draw_style_box(panel_style, Rect2(12, 12, 236, 56))
 	draw_img("crumb", Vector2(36, 40), Vector2(22, 22), PINK)
 	draw_string(font, Vector2(58, 32), "carrying", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, DARK)
@@ -300,31 +287,26 @@ func draw_hud():
 	draw_rect(Rect2(136, 27, 14, 8), PEACH)
 	draw_colored_polygon(PackedVector2Array([Vector2(133, 27), Vector2(143, 19), Vector2(153, 27)]), SALMON)
 	draw_string(font, Vector2(160, 34), "home", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, DARK)
-	# journey progress: which setting you're in + how far across it
 	var progress = clamp((stage + clamp(ant.x / W, 0.0, 1.0)) / float(STAGES), 0.0, 1.0)
 	draw_style_box(make_box(GREY, DARK, 2, 8), Rect2(134, 42, 104, 16))
 	if progress > 0.0:
 		var fill_w = max(16.0, 104.0 * progress)
 		draw_style_box(make_box(GREEN, DARK, 2, 8), Rect2(134, 42, fill_w, 16))
 
-	# timer panel
 	draw_style_box(panel_style, Rect2(W - 100, 12, 88, 44))
 	var tcol = BERRY if time_left < 10.0 else DARK
 	text_in(Rect2(W - 100, 12, 88, 44), str(int(ceil(time_left))) + "s", 26, tcol)
 
-	# setting name banner
 	if stage_banner > 0.0:
 		draw_style_box(panel_style, Rect2(210, 76, 220, 30))
 		text_in(Rect2(210, 76, 220, 30), STAGE_NAMES[stage], 18, DARK)
 
-	# last setting: remind how many crumbs the colony needs
 	if stage == STAGES - 1 and ant.x > W - 200.0 and carried < NEED:
 		draw_style_box(panel_style, Rect2(120, 300, 400, 34))
 		text_in(Rect2(120, 300, 400, 34), "need " + str(NEED) + " crumbs to feed the colony!", 16, DARK)
 
 
 func _draw():
-	# full-screen drawn endings (optional): gameover.png and win.png
 	if state == "over" and get_tex("gameover") != null:
 		draw_full("gameover")
 		return
@@ -375,7 +357,6 @@ func _draw():
 
 	draw_ant_game()
 
-	# giant feet: growing shadow circle, then the foot lands
 	for s in stomps:
 		if not s["hit"]:
 			var r = lerp(12.0, HIT_RADIUS, s["t"] / s["warn"])
